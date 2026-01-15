@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2CE92514-F6D8-41A3-B3A0-26EB7D73D1BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "src\Bot\Bot.csproj", "{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55} = {2CE92514-F6D8-41A3-B3A0-26EB7D73D1BE}
+	EndGlobalSection
+EndGlobal
