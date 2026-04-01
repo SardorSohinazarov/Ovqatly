@@ -8,7 +8,7 @@ using Blob = Google.GenAI.Types.Blob;
 
 namespace Bot.Services;
 
-public partial class UpdateHandlerService(Client geminiClient)
+public partial class UpdateHandlerService(Client geminiClient, ILogger<UpdateHandlerService> logger)
 {
     private static readonly ConcurrentDictionary<string, List<byte[]>> _mediaGroups = new();
     private async Task HandlePhotoAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)

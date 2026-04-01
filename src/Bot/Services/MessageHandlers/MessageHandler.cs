@@ -34,7 +34,12 @@ namespace Bot.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message.ToString());
+                logger.LogError(
+                    ex,
+                    "Failed while handling message of type {MessageType}",
+                    update.Message?.Type);
+
+                await SendFallbackMessageAsync(botClient, update, cancellationToken);
             }
         }
 
