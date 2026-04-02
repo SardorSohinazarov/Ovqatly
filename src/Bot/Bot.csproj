@@ -12,4 +12,8 @@
 	<PackageReference Include="Google.GenAI" Version="0.11.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
 </Project>
