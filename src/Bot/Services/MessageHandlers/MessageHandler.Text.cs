@@ -5,6 +5,14 @@ namespace Bot.Services;
 
 public partial class UpdateHandlerService
 {
+    private const string StartMessage = """
+    Salom! Menga ovqat rasmini yuboring, men taxminiy kaloriya hisoblab beraman.
+
+    Qulay foydalanish uchun:
+    - Bitta ovqat uchun bitta rasm yuboring
+    - Agar album (media group) yuborsangiz, bot har bir ovqatni alohida rasm qilib yuborishni so'raydi
+    """;
+
     private async Task HandleTextMessageAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         var message = update.Message;
@@ -14,7 +22,7 @@ public partial class UpdateHandlerService
         {
             await botClient.SendMessage(
                 chatId,
-                "Salom! Menga ovqat rasmini yuboring (kalloriya hisoblayman) yoki xohlagan savolingizni bering.");
+                StartMessage);
             return;
         }
         var response = await geminiClient.Models.GenerateContentAsync(
