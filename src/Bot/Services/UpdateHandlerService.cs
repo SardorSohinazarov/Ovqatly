@@ -1,97 +1,64 @@
-﻿using Telegram.Bot;
+using Bot.Services.MessageHandlers;
+using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Bot.Services
+namespace Bot.Services;
+
+public sealed class UpdateHandlerService(
+    ITextMessageHandler textMessageHandler,
+    IPhotoMessageHandler photoMessageHandler,
+    ILogger<UpdateHandlerService> logger) : IUpdateHandler
 {
-    public partial class UpdateHandlerService : IUpdateHandler
+    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        try
         {
-            var updateHandler = update.Type switch
+            await (update.Type switch
             {
                 UpdateType.Message => HandleMessageAsync(botClient, update, cancellationToken),
-                UpdateType.EditedMessage => HandleEditedMessageAsync(botClient, update, cancellationToken),
-                UpdateType.CallbackQuery => HandleCallbackQueryAsync(botClient, update, cancellationToken),
-                UpdateType.InlineQuery => HandleInlineQueryAsync(botClient, update, cancellationToken),
-                _ => HandleUnknownUpdateAsync(botClient, update, cancellationToken),
-            };
-
-            try
-            {
-                await updateHandler;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed while handling update of type {UpdateType}", update.Type);
-                await SendFallbackMessageAsync(botClient, update, cancellationToken);
-            }
+                UpdateType.EditedMessage => HandleSkippedUpdateAsync(update.Type),
+                UpdateType.CallbackQuery => HandleSkippedUpdateAsync(update.Type),
+                UpdateType.InlineQuery => HandleSkippedUpdateAsync(update.Type),
+                _ => HandleSkippedUpdateAsync(update.Type)
+            });
         }
-
-        public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            logger.LogError(
-                exception,
-                "Telegram polling error occurred while handling source {Source}",
-                source);
-
-            // Global polling errors do not include the original update/chat context,
-            // so we only log here. User-facing fallback messages are sent from the
-            // per-update catch blocks where chat context is available.
-            await Task.CompletedTask;
+            logger.LogError(ex, "Failed while handling update of type {UpdateType}", update.Type);
         }
+    }
 
-        private async Task HandleUnknownUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
+    {
+        logger.LogError(
+            exception,
+            "Telegram polling error occurred while handling source {Source}",
+            source);
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleSkippedUpdateAsync(UpdateType updateType)
+    {
+        logger.LogDebug("Skipping unsupported update type {UpdateType}", updateType);
+        return Task.CompletedTask;
+    }
+
+    private Task HandleMessageAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    {
+        var message = update.Message;
+        if (message is null)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
-        private async Task HandleInlineQueryAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        return message.Type switch
         {
-            throw new NotImplementedException();
-        }
-
-        private async Task HandleCallbackQueryAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task HandleEditedMessageAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task SendFallbackMessageAsync(
-            ITelegramBotClient botClient,
-            Update update,
-            CancellationToken cancellationToken)
-        {
-            var chatId =
-                update.Message?.Chat.Id
-                ?? update.EditedMessage?.Chat.Id
-                ?? update.CallbackQuery?.Message?.Chat.Id;
-
-            if (chatId is null)
-            {
-                logger.LogWarning("Skipping fallback response because no chat context was available.");
-                return;
-            }
-
-            try
-            {
-                await botClient.SendMessage(
-                    chatId.Value,
-                    "Kechirasiz, kutilmagan xatolik yuz berdi. Iltimos, bir ozdan keyin qayta urinib ko'ring.",
-                    cancellationToken: cancellationToken);
-            }
-            catch (Exception sendEx)
-            {
-                logger.LogWarning(
-                    sendEx,
-                    "Failed to send fallback message to chat {ChatId}",
-                    chatId.Value);
-            }
-        }
+            MessageType.Text => textMessageHandler.HandleAsync(botClient, update, cancellationToken),
+            MessageType.Photo => photoMessageHandler.HandleAsync(botClient, update, cancellationToken),
+            _ => HandleSkippedUpdateAsync(update.Type)
+        };
     }
 }

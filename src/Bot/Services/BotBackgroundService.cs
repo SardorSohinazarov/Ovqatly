@@ -5,7 +5,7 @@ namespace Bot.Services;
 
 public class BotBackgroundService(
     ILogger<BotBackgroundService> logger,
-    TelegramBotClient botClient,
+    ITelegramBotClient botClient,
     IUpdateHandler updateHandler) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

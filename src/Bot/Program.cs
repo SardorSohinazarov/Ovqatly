@@ -1,4 +1,5 @@
 using Bot.Services;
+using Bot.Services.MessageHandlers;
 using Telegram.Bot.Polling;
 using Telegram.Bot;
 using Google.GenAI;
@@ -13,11 +14,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<BotBackgroundService>();
-builder.Services.AddSingleton(new TelegramBotClient(builder.Configuration["TelegramBotAPIKey"]));
-builder.Services.AddSingleton<IPhotoMessageProcessor, PhotoMessageProcessingService>();
+builder.Services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(builder.Configuration["TelegramBotAPIKey"]!));
 builder.Services.AddSingleton<IUpdateHandler, UpdateHandlerService>();
+builder.Services.AddSingleton<IAiResponseService, AiResponseService>();
+builder.Services.AddSingleton<IMediaGroupAggregator, MediaGroupAggregator>();
+builder.Services.AddSingleton<ITextMessageHandler, TextMessageHandler>();
+builder.Services.AddSingleton<IPhotoMessageHandler, PhotoMessageHandler>();
 
-builder.Services.AddSingleton<Client>(sp =>
+builder.Services.AddSingleton<Client>(_ =>
 {
     var apiKey = builder.Configuration["GoogleAIApiKey"];
     return new Client(apiKey: apiKey);

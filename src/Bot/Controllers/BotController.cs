@@ -6,7 +6,7 @@ namespace Bot.Controllers
     [ApiController]
     public class BotController : ControllerBase
     {
-        [HttpGet]
-        public async Task<IActionResult> Get() => Ok("Bot is running");
+        [HttpGet("health")]
+        public IActionResult Health() => Ok(new { status = "ok", service = "Bot" });
     }
 }
