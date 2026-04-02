@@ -1,3 +1,4 @@
+using Bot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -5,7 +6,7 @@ namespace Bot.Services.MessageHandlers;
 
 public interface ITextMessageHandler
 {
-    Task HandleAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken);
+    Task HandleAsync(ITelegramBotFacade botClient, Update update, CancellationToken cancellationToken);
 }
 
 public sealed class TextMessageHandler(IAiResponseService aiResponseService) : ITextMessageHandler
@@ -18,7 +19,7 @@ public sealed class TextMessageHandler(IAiResponseService aiResponseService) : I
     - Agar album (media group) yuborsangiz, bot har bir ovqatni alohida rasm qilib yuborishni so'raydi
     """;
 
-    public async Task HandleAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public async Task HandleAsync(ITelegramBotFacade botClient, Update update, CancellationToken cancellationToken)
     {
         var message = update.Message;
         if (message?.Text is null)
@@ -30,20 +31,20 @@ public sealed class TextMessageHandler(IAiResponseService aiResponseService) : I
 
         if (message.Text == "/start")
         {
-            await botClient.SendMessage(chatId, StartMessage, cancellationToken: cancellationToken);
+            await botClient.SendTextMessageAsync(chatId, StartMessage, cancellationToken);
             return;
         }
 
         var response = await aiResponseService.GenerateChatReplyAsync(message.Text, cancellationToken);
         if (string.IsNullOrWhiteSpace(response))
         {
-            await botClient.SendMessage(
+            await botClient.SendTextMessageAsync(
                 chatId,
                 "Kechirasiz, javob tayyorlanmadi. Iltimos, qayta urinib ko'ring.",
-                cancellationToken: cancellationToken);
+                cancellationToken);
             return;
         }
 
-        await botClient.SendMessage(chatId, response, cancellationToken: cancellationToken);
+        await botClient.SendTextMessageAsync(chatId, response, cancellationToken);
     }
 }

@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11626.173 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2CE92514-F6D8-41A3-B3A0-26EB7D73D1BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "src\Bot\Bot.csproj", "{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{65EFB735-4D01-4F7D-A9F1-CB75ADBF3A9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.Unit.Test", "tests\Bot.Unit.Test\Bot.Unit.Test.csproj", "{0994B964-280B-482B-8B4A-3D9988DA3BB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,11 +21,19 @@ Global
 		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0994B964-280B-482B-8B4A-3D9988DA3BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0994B964-280B-482B-8B4A-3D9988DA3BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0994B964-280B-482B-8B4A-3D9988DA3BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0994B964-280B-482B-8B4A-3D9988DA3BB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4C61B5D9-0B2F-4031-9FC1-B08AEAF70F55} = {2CE92514-F6D8-41A3-B3A0-26EB7D73D1BE}
+		{0994B964-280B-482B-8B4A-3D9988DA3BB9} = {65EFB735-4D01-4F7D-A9F1-CB75ADBF3A9B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6BD71825-6325-47E9-BD31-08BBADF0F380}
 	EndGlobalSection
 EndGlobal

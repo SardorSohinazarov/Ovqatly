@@ -7,6 +7,7 @@ using Telegram.Bot.Types.Enums;
 namespace Bot.Services;
 
 public sealed class UpdateHandlerService(
+    ITelegramBotFacade botFacade,
     ITextMessageHandler textMessageHandler,
     IPhotoMessageHandler photoMessageHandler,
     ILogger<UpdateHandlerService> logger) : IUpdateHandler
@@ -17,7 +18,7 @@ public sealed class UpdateHandlerService(
         {
             await (update.Type switch
             {
-                UpdateType.Message => HandleMessageAsync(botClient, update, cancellationToken),
+                UpdateType.Message => HandleMessageAsync(update, cancellationToken),
                 UpdateType.EditedMessage => HandleSkippedUpdateAsync(update.Type),
                 UpdateType.CallbackQuery => HandleSkippedUpdateAsync(update.Type),
                 UpdateType.InlineQuery => HandleSkippedUpdateAsync(update.Type),
@@ -46,7 +47,7 @@ public sealed class UpdateHandlerService(
         return Task.CompletedTask;
     }
 
-    private Task HandleMessageAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    private Task HandleMessageAsync(Update update, CancellationToken cancellationToken)
     {
         var message = update.Message;
         if (message is null)
@@ -56,8 +57,8 @@ public sealed class UpdateHandlerService(
 
         return message.Type switch
         {
-            MessageType.Text => textMessageHandler.HandleAsync(botClient, update, cancellationToken),
-            MessageType.Photo => photoMessageHandler.HandleAsync(botClient, update, cancellationToken),
+            MessageType.Text => textMessageHandler.HandleAsync(botFacade, update, cancellationToken),
+            MessageType.Photo => photoMessageHandler.HandleAsync(botFacade, update, cancellationToken),
             _ => HandleSkippedUpdateAsync(update.Type)
         };
     }

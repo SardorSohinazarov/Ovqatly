@@ -15,6 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<BotBackgroundService>();
 builder.Services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(builder.Configuration["TelegramBotAPIKey"]!));
+builder.Services.AddSingleton<ITelegramBotFacade, TelegramBotFacade>();
 builder.Services.AddSingleton<IUpdateHandler, UpdateHandlerService>();
 builder.Services.AddSingleton<IAiResponseService, AiResponseService>();
 builder.Services.AddSingleton<IMediaGroupAggregator, MediaGroupAggregator>();
@@ -44,3 +45,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

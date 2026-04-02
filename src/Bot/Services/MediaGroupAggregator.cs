@@ -9,11 +9,11 @@ public interface IMediaGroupAggregator
 
 public sealed class MediaGroupAggregator : IMediaGroupAggregator
 {
-    private static readonly ConcurrentDictionary<string, byte> NotifiedMediaGroups = new();
+    private readonly ConcurrentDictionary<string, byte> _notifiedMediaGroups = new();
 
     public bool TryRegister(string mediaGroupId)
     {
-        if (!NotifiedMediaGroups.TryAdd(mediaGroupId, 0))
+        if (!_notifiedMediaGroups.TryAdd(mediaGroupId, 0))
         {
             return false;
         }
@@ -22,7 +22,7 @@ public sealed class MediaGroupAggregator : IMediaGroupAggregator
         return true;
     }
 
-    private static async Task RemoveLaterAsync(string mediaGroupId)
+    private async Task RemoveLaterAsync(string mediaGroupId)
     {
         try
         {
@@ -33,6 +33,6 @@ public sealed class MediaGroupAggregator : IMediaGroupAggregator
             return;
         }
 
-        NotifiedMediaGroups.TryRemove(mediaGroupId, out _);
+        _notifiedMediaGroups.TryRemove(mediaGroupId, out _);
     }
 }

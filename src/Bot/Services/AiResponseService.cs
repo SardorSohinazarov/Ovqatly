@@ -20,7 +20,7 @@ public sealed class AiResponseService(Client geminiClient, ILogger<AiResponseSer
                 model: "gemini-3-flash-preview",
                 contents: prompt);
 
-            return NormalizeResponse(response.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text);
+            return AiResponseFormatter.Normalize(response.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text);
         }
         catch (Exception ex)
         {
@@ -70,42 +70,12 @@ public sealed class AiResponseService(Client geminiClient, ILogger<AiResponseSer
                 model: "gemini-2.5-flash-lite",
                 contents: new Content { Parts = parts });
 
-            return NormalizeResponse(response.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text);
+            return AiResponseFormatter.Normalize(response.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to analyze food image.");
             return null;
         }
-    }
-
-    private static string? NormalizeResponse(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return null;
-        }
-
-        var lines = text
-            .Replace("\r\n", "\n")
-            .Split('\n', StringSplitOptions.None)
-            .Select(line => line.Trim())
-            .ToList();
-
-        var firstRelevantLineIndex = lines.FindIndex(line =>
-            line.StartsWith('|') ||
-            line.StartsWith("Umumiy kaloriya yig'indisi", StringComparison.OrdinalIgnoreCase));
-
-        if (firstRelevantLineIndex < 0)
-        {
-            return text.Trim();
-        }
-
-        var normalizedLines = lines
-            .Skip(firstRelevantLineIndex)
-            .Where(line => !string.IsNullOrWhiteSpace(line))
-            .ToList();
-
-        return string.Join(System.Environment.NewLine, normalizedLines).Trim();
     }
 }

@@ -1,11 +1,11 @@
-using Telegram.Bot;
+using Bot.Services;
 using Telegram.Bot.Types;
 
 namespace Bot.Services.MessageHandlers;
 
 public interface IPhotoMessageHandler
 {
-    Task HandleAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken);
+    Task HandleAsync(ITelegramBotFacade botClient, Update update, CancellationToken cancellationToken);
 }
 
 public sealed class PhotoMessageHandler(
@@ -13,7 +13,7 @@ public sealed class PhotoMessageHandler(
     IMediaGroupAggregator mediaGroupAggregator,
     ILogger<PhotoMessageHandler> logger) : IPhotoMessageHandler
 {
-    public async Task HandleAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public async Task HandleAsync(ITelegramBotFacade botClient, Update update, CancellationToken cancellationToken)
     {
         var message = update.Message;
         if (message?.Photo is null)
@@ -34,29 +34,35 @@ public sealed class PhotoMessageHandler(
         {
             if (mediaGroupAggregator.TryRegister(message.MediaGroupId))
             {
-                await botClient.SendMessage(
+                await botClient.SendTextMessageAsync(
                     chatId,
                     "Media group yubordingiz. Iltimos, har bir ovqatni alohida rasm qilib yuboring. Shunda men har birini alohida kaloriya bilan tahlil qilib beraman.",
-                    cancellationToken: cancellationToken);
+                    cancellationToken);
             }
 
             return;
         }
 
-        var file = await botClient.GetFile(photo.FileId, cancellationToken);
+        var filePath = await botClient.GetFilePathAsync(photo.FileId, cancellationToken);
         using var ms = new MemoryStream();
-        await botClient.DownloadFile(file.FilePath!, ms, cancellationToken);
+        if (filePath is null)
+        {
+            logger.LogWarning("Telegram returned an empty file path for photo {MessageId}.", message.MessageId);
+            return;
+        }
+
+        await botClient.DownloadFileAsync(filePath, ms, cancellationToken);
 
         var response = await aiResponseService.AnalyzeFoodImageAsync(ms.ToArray(), cancellationToken);
         if (string.IsNullOrWhiteSpace(response))
         {
-            await botClient.SendMessage(
+            await botClient.SendTextMessageAsync(
                 chatId,
                 "Kechirasiz, rasmni tahlil qilishda javob olinmadi. Iltimos, qayta urinib ko'ring.",
-                cancellationToken: cancellationToken);
+                cancellationToken);
             return;
         }
 
-        await botClient.SendMessage(chatId, response, cancellationToken: cancellationToken);
+        await botClient.SendTextMessageAsync(chatId, response, cancellationToken);
     }
 }
