@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<BotBackgroundService>();
 builder.Services.AddSingleton(new TelegramBotClient(builder.Configuration["TelegramBotAPIKey"]));
+builder.Services.AddSingleton<IPhotoMessageProcessor, PhotoMessageProcessingService>();
 builder.Services.AddSingleton<IUpdateHandler, UpdateHandlerService>();
 
 builder.Services.AddSingleton<Client>(sp =>
